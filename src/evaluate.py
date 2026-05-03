@@ -2,7 +2,6 @@ import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import seaborn as sns
 import torch
 from sklearn.metrics import (
     accuracy_score,
@@ -15,22 +14,36 @@ from dataset import build_stl10_datasets, build_dataloaders
 from models import build_model
 from utils import ensure_dir, save_json
 
+try:
+    import seaborn as sns
+except ModuleNotFoundError:
+    sns = None
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate STL10 checkpoint")
     parser.add_argument("--ckpt", type=str, required=True, help="Path to best checkpoint")
-    parser.add_argument("--data_root", type=str, default=".")
+    parser.add_argument("--data_root", type=str, default="STL10")
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--val_ratio", type=float, default=0.1)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--exp_name", type=str, default="task1")
+    parser.add_argument("--use_bn", action="store_true")
+    parser.add_argument("--dropout", type=float, default=0.0)
     return parser.parse_args()
 
 
 def plot_confusion_matrix(cm, class_names, save_path):
     plt.figure(figsize=(9, 7))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names)
+    if sns is not None:
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names)
+    else:
+        plt.imshow(cm, interpolation="nearest", cmap="Blues")
+        plt.colorbar()
+        ticks = range(len(class_names))
+        plt.xticks(ticks, class_names, rotation=45, ha="right")
+        plt.yticks(ticks, class_names)
     plt.xlabel("Predicted")
     plt.ylabel("True")
     plt.title("Confusion Matrix (Test)")
@@ -64,7 +77,10 @@ def main():
         seed=args.seed,
     )
 
-    model = build_model(model_name, num_classes=10).to(device)
+    ckpt_args = ckpt.get("args", {})
+    use_bn = bool(ckpt_args.get("use_bn", args.use_bn))
+    dropout = float(ckpt_args.get("dropout", args.dropout))
+    model = build_model(model_name, num_classes=10, use_bn=use_bn, dropout=dropout).to(device)
     model.load_state_dict(ckpt["model_state_dict"])
     model.eval()
 
@@ -112,6 +128,10 @@ def main():
             "confusion_matrix": cm.tolist(),
             "ckpt": args.ckpt,
             "model_name": model_name,
+            "use_bn": use_bn,
+            "dropout": dropout,
+            "optimizer": ckpt_args.get("optimizer"),
+            "lr": ckpt_args.get("lr"),
         },
         str(out_report / f"{file_prefix}_{model_name}_test_metrics.json"),
     )

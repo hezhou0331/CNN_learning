@@ -10,6 +10,94 @@ from models import build_model
 from utils import ensure_dir, plot_training_curves, save_json, seed_everything
 
 
+EXPERIMENT_PRESETS = {
+    # Baseline control group.
+    "baseline": {
+        "exp_name": "exp0_baseline",
+        "model": "baseline",
+        "use_augmentation": False,
+        "use_bn": False,
+        "dropout": 0.0,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 1: data augmentation only.
+    "exp1_aug": {
+        "exp_name": "exp1_aug",
+        "model": "baseline",
+        "use_augmentation": True,
+        "use_bn": False,
+        "dropout": 0.0,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 2: augmentation + batch normalization.
+    "exp2_aug_bn": {
+        "exp_name": "exp2_aug_bn",
+        "model": "configurable",
+        "use_augmentation": True,
+        "use_bn": True,
+        "dropout": 0.0,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 3: augmentation + batch normalization + dropout.
+    "exp3_aug_bn_dropout": {
+        "exp_name": "exp3_aug_bn_dropout",
+        "model": "configurable",
+        "use_augmentation": True,
+        "use_bn": True,
+        "dropout": 0.3,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 4A: optimizer/LR comparison branch (Adam).
+    "exp4_opt_adam": {
+        "exp_name": "exp4_opt_adam",
+        "model": "configurable",
+        "use_augmentation": True,
+        "use_bn": True,
+        "dropout": 0.3,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 4B: optimizer/LR comparison branch (SGD).
+    "exp4_opt_sgd": {
+        "exp_name": "exp4_opt_sgd",
+        "model": "configurable",
+        "use_augmentation": True,
+        "use_bn": True,
+        "dropout": 0.3,
+        "optimizer": "sgd",
+        "lr": 1e-2,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 5: best combination selected from prior trials.
+    "exp5_best_combo": {
+        "exp_name": "exp5_best_combo",
+        "model": "configurable",
+        "use_augmentation": True,
+        "use_bn": True,
+        "dropout": 0.3,
+        "optimizer": "adamw",
+        "lr": 8e-4,
+        "weight_decay": 1e-3,
+        "scheduler": "cosine",
+    },
+}
+
+
 def run_one_epoch(model, loader, criterion, device, optimizer=None):
     is_train = optimizer is not None
     model.train() if is_train else model.eval()
@@ -44,9 +132,9 @@ def run_one_epoch(model, loader, criterion, device, optimizer=None):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train STL10 classifier")
-    parser.add_argument("--data_root", type=str, default=".")
-    parser.add_argument("--model", type=str, default="baseline", choices=["baseline", "improved"])
-    parser.add_argument("--epochs", type=int, default=30)
+    parser.add_argument("--data_root", type=str, default="STL10")
+    parser.add_argument("--model", type=str, default="baseline", choices=["baseline", "improved", "configurable"])
+    parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight_decay", type=float, default=0.0)
@@ -61,7 +149,19 @@ def parse_args():
     parser.add_argument("--output_root", type=str, default="")
     parser.add_argument("--run_tag", type=str, default="")
     parser.add_argument("--continue_run", action="store_true")
+    parser.add_argument("--experiment_id", type=str, default="", choices=[""] + sorted(EXPERIMENT_PRESETS.keys()))
+    parser.add_argument("--use_bn", action="store_true")
+    parser.add_argument("--dropout", type=float, default=0.0)
     return parser.parse_args()
+
+
+def apply_experiment_preset(args):
+    if not args.experiment_id:
+        return args
+    preset = EXPERIMENT_PRESETS[args.experiment_id]
+    for key, value in preset.items():
+        setattr(args, key, value)
+    return args
 
 
 def build_optimizer(name, model, lr, weight_decay):
@@ -88,6 +188,7 @@ def build_scheduler(name, optimizer, epochs):
 
 def main():
     args = parse_args()
+    args = apply_experiment_preset(args)
     seed_everything(args.seed)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -121,7 +222,12 @@ def main():
         seed=args.seed,
     )
 
-    model = build_model(args.model, num_classes=10).to(device)
+    model = build_model(
+        args.model,
+        num_classes=10,
+        use_bn=args.use_bn,
+        dropout=args.dropout,
+    ).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = build_optimizer(args.optimizer, model, args.lr, args.weight_decay)
     scheduler = build_scheduler(args.scheduler, optimizer, args.epochs)
@@ -207,6 +313,15 @@ def main():
             "run_tag": run_tag,
             "output_root": str(output_root),
             "run_root": str(run_root),
+            "experiment_id": args.experiment_id,
+            "model": args.model,
+            "use_augmentation": args.use_augmentation,
+            "use_bn": args.use_bn,
+            "dropout": args.dropout,
+            "optimizer": args.optimizer,
+            "lr": args.lr,
+            "weight_decay": args.weight_decay,
+            "scheduler": args.scheduler,
         },
         str(summary_path),
     )

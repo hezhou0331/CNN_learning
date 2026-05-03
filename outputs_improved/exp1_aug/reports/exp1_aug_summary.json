@@ -1,0 +1,17 @@
+{
+  "best_epoch": 21,
+  "best_val_acc": 71.57142857142857,
+  "ckpt_path": "outputs_improved\\exp1_aug\\checkpoints\\exp1_aug_best.pth",
+  "run_tag": "exp1_aug",
+  "output_root": "outputs_improved",
+  "run_root": "outputs_improved\\exp1_aug",
+  "experiment_id": "exp1_aug",
+  "model": "baseline",
+  "use_augmentation": true,
+  "use_bn": false,
+  "dropout": 0.0,
+  "optimizer": "adam",
+  "lr": 0.001,
+  "weight_decay": 0.0005,
+  "scheduler": "cosine"
+}

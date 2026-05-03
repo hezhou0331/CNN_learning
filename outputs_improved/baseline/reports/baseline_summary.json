@@ -1,0 +1,17 @@
+{
+  "best_epoch": 13,
+  "best_val_acc": 61.42857142857143,
+  "ckpt_path": "outputs_improved\\baseline\\checkpoints\\baseline_best.pth",
+  "run_tag": "baseline",
+  "output_root": "outputs_improved",
+  "run_root": "outputs_improved\\baseline",
+  "experiment_id": "baseline",
+  "model": "baseline",
+  "use_augmentation": false,
+  "use_bn": false,
+  "dropout": 0.0,
+  "optimizer": "adam",
+  "lr": 0.001,
+  "weight_decay": 0.0005,
+  "scheduler": "cosine"
+}

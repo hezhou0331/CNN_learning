@@ -1,0 +1,17 @@
+{
+  "best_epoch": 48,
+  "best_val_acc": 73.57142857142857,
+  "ckpt_path": "outputs_improved\\exp4_opt_adam\\checkpoints\\exp4_opt_adam_best.pth",
+  "run_tag": "exp4_opt_adam",
+  "output_root": "outputs_improved",
+  "run_root": "outputs_improved\\exp4_opt_adam",
+  "experiment_id": "exp4_opt_adam",
+  "model": "configurable",
+  "use_augmentation": true,
+  "use_bn": true,
+  "dropout": 0.3,
+  "optimizer": "adam",
+  "lr": 0.001,
+  "weight_decay": 0.0005,
+  "scheduler": "cosine"
+}
