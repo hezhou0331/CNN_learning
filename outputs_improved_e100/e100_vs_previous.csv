@@ -1,6 +1,0 @@
-experiment_id,previous_run,previous_test_accuracy,new_run,new_last_epoch,new_stop_reason,new_test_accuracy,delta_test_pp
-exp2_aug_bn,exp2_aug_bn,0.717,exp2_aug_bn_e100p20,97,early_stop_val_acc_patience,0.746,2.90
-exp3_aug_dropout,,,exp3_aug_dropout_e100p20,88,early_stop_val_acc_patience,0.722,
-exp6_improved_long_6,exp6_improved_long_6,0.804,exp6_improved_long_6_e100p20,100,max_epochs_reached,0.818,1.40
-exp7_improved_long_9,exp7_improved_long_9,0.816,exp7_improved_long_9_e100p20,93,early_stop_val_acc_patience,0.814,-0.20
-exp9_aug_bn_15conv,exp9_aug_bn_15conv,0.731,exp9_aug_bn_15conv_e100p20,100,max_epochs_reached,0.773,4.20

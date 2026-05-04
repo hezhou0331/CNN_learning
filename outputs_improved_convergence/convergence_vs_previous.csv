@@ -1,5 +1,0 @@
-experiment_id,previous_run,previous_best_epoch,previous_best_val_acc,previous_test_accuracy,new_run,new_best_epoch,new_best_val_acc,new_test_accuracy,delta_test_accuracy_pp
-exp1_aug,exp1_aug,21,71.57142857142857,0.665,exp1_aug_conv150,64,74.0,0.683,1.80
-exp4_aug_bn_sgd,exp4_aug_bn_sgd,30,74.57142857142857,0.703,exp4_aug_bn_sgd,86,76.71428571428571,0.711,0.80
-exp5_aug_bn_lr,exp5_aug_bn_lr,28,74.42857142857143,0.698,exp5_aug_bn_lr,78,76.42857142857143,0.733,3.50
-exp8_improved_longer_12,exp8_improved_longer_12,14,70.28571428571429,0.695,exp8_improved_longer_12,143,84.57142857142857,0.812,11.70

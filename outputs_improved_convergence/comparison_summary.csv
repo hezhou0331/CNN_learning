@@ -1,5 +1,0 @@
-run,model,use_augmentation,use_bn,dropout,optimizer,lr,best_epoch,best_val_acc,test_accuracy,macro_f1,weighted_f1
-exp4_aug_bn_sgd,configurable,True,True,0.0,sgd,0.01,86,76.71428571428571,0.711,0.7114590612215841,0.7114590612215841
-exp5_aug_bn_lr,configurable,True,True,0.0,adam,0.0003,78,76.42857142857143,0.733,0.7315886907590067,0.7315886907590066
-exp8_improved_longer_12,improved_longer_12,True,True,0.3,adam,0.001,143,84.57142857142857,0.812,0.8120110808563954,0.8120110808563954
-exp1_aug_conv150,baseline,True,False,0.0,adam,0.001,64,74.0,0.683,0.6858449368940387,0.6858449368940388

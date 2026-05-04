@@ -26,3 +26,14 @@ __pycache__/
 *.log
 *.toc
 *.xdv
+
+# Local temporary experiment outputs / notes
+outputs_baseline/
+outputs_improved_convergence/
+outputs_improved_e100/
+scripts/
+PLAN_*.md
+AI.MD
+memory.md
+.cursorignore
+best_stl10_cnn.pth
