@@ -1,10 +1,10 @@
 {
-  "best_epoch": 13,
-  "best_val_acc": 61.42857142857143,
-  "ckpt_path": "outputs_improved\\baseline\\checkpoints\\baseline_best.pth",
+  "best_epoch": 23,
+  "best_val_acc": 61.285714285714285,
+  "ckpt_path": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved\\baseline\\checkpoints\\baseline_best.pth",
   "run_tag": "baseline",
-  "output_root": "outputs_improved",
-  "run_root": "outputs_improved\\baseline",
+  "output_root": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved",
+  "run_root": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved\\baseline",
   "experiment_id": "baseline",
   "model": "baseline",
   "use_augmentation": false,
@@ -13,5 +13,11 @@
   "optimizer": "adam",
   "lr": 0.001,
   "weight_decay": 0.0005,
-  "scheduler": "cosine"
+  "scheduler": "cosine",
+  "last_epoch": 43,
+  "stop_reason": "early_stop_val_acc_patience",
+  "epochs_requested": 100,
+  "patience": 20,
+  "scheduled_end_epoch": 100,
+  "started_from_epoch": 1
 }

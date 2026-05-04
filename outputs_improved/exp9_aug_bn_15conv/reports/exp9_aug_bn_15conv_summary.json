@@ -1,10 +1,10 @@
 {
-  "best_epoch": 55,
-  "best_val_acc": 76.42857142857143,
-  "ckpt_path": "outputs_improved\\exp9_aug_bn_15conv\\checkpoints\\exp9_aug_bn_15conv_best.pth",
+  "best_epoch": 87,
+  "best_val_acc": 80.85714285714286,
+  "ckpt_path": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved\\exp9_aug_bn_15conv\\checkpoints\\exp9_aug_bn_15conv_best.pth",
   "run_tag": "exp9_aug_bn_15conv",
-  "output_root": "outputs_improved",
-  "run_root": "outputs_improved\\exp9_aug_bn_15conv",
+  "output_root": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved",
+  "run_root": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved\\exp9_aug_bn_15conv",
   "experiment_id": "exp9_aug_bn_15conv",
   "model": "configurable_15conv",
   "use_augmentation": true,
@@ -13,5 +13,11 @@
   "optimizer": "adam",
   "lr": 0.001,
   "weight_decay": 0.0005,
-  "scheduler": "cosine"
+  "scheduler": "cosine",
+  "last_epoch": 100,
+  "stop_reason": "max_epochs_reached",
+  "epochs_requested": 100,
+  "patience": 20,
+  "scheduled_end_epoch": 100,
+  "started_from_epoch": 1
 }

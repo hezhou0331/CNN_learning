@@ -7,6 +7,7 @@
 \usepackage{float}
 \usepackage{placeins}
 \usepackage{array}
+\usepackage[hidelinks]{hyperref}
 
 % 混淆矩阵子图高度（与汇总表同页时需偏紧，可按编译效果微调 0.10--0.13）
 \newcommand{\cmfig}[1]{\includegraphics[width=\linewidth,height=0.115\textheight,keepaspectratio]{#1}}
@@ -55,13 +56,14 @@
 \section{实验设置}
 \begin{itemize}
   \item 数据来源：\texttt{STL10/train} 与 \texttt{STL10/test}。（课程提供）
-  \item 训练配置：固定 \texttt{epochs=50}、\texttt{batch\_size=128}、\texttt{val\_ratio=0.1}、\texttt{seed=42}。
+  \item 训练配置：\texttt{batch\_size=128}、\texttt{val\_ratio=0.1}、\texttt{seed=42}。训练集按固定随机种子划分出验证集，验证集用于选择最佳 checkpoint；如果验证集准确率连续 \texttt{patience=20} 个 epoch 没有刷新最优值，则提前停止训练。
   \item 评估指标：Accuracy、Macro-F1、Weighted-F1、分类报告、混淆矩阵。
   \item 输出目录：\texttt{outputs\_improved/}。（可在压缩包或github上查看）
 \end{itemize}
 
-\section{实验分组}
-实验主要有8组，分别在baseline的基础上进行修改，包括数据增强、BatchNorm、Dropout、优化器、学习率、网络深度等
+
+\section{实验分组与网络结构说明}
+实验在 baseline 上共 9 组改进设置，覆盖数据增强、BatchNorm、Dropout、优化器、学习率、网络深度，以及在同配方下增加卷积层数等。
 \begin{itemize}
   \item baseline：基础 CNN，无增强、无 BN、无 Dropout（Adam, lr=0.001, L2 \texttt{weight\_decay=5e-4}）
   \item exp1\_aug：数据增强（RandomCrop + HorizontalFlip + ColorJitter）
@@ -72,11 +74,12 @@
   \item exp6\_improved\_long\_6：与 exp2 相同，卷积层数改为6
   \item exp7\_improved\_long\_9：与 exp2 相同，卷积层数改为9
   \item exp8\_improved\_longer\_12：与 exp2 相同，卷积层数改为12
+  \item exp9\_aug\_bn\_15conv：与 exp2 相同，卷积层数改为15
 \end{itemize}
 
 \clearpage
 \section{实验结果概览}
-下面附上全部实验的实验结果，其中test成功率最低的为baseline，为54.70\%，最高的为exp7\_improved\_long\_9，为81.60\%。
+下面附上全部实验的实验结果，其中测试准确率最低为 baseline（55.90\%），最高为 \texttt{exp6\_improved\_long\_6}（81.80\%）。
 详细的训练分析在后面会给出
 \begin{center}
 \begin{minipage}[t]{0.95\textwidth}
@@ -87,15 +90,16 @@
 \toprule
 实验组 & Best Val Acc(\%) & Test Acc(\%) & Macro-F1 & Weighted-F1 \\
 \midrule
-baseline & 61.43 & 54.70 & 0.5464 & 0.5464 \\
-exp1\_aug & 71.57 & 66.50 & 0.6688 & 0.6688 \\
-exp2\_aug\_bn & 77.14 & 71.70 & 0.7178 & 0.7178 \\
-exp3\_aug\_dropout & 74.14 & 69.00 & 0.6918 & 0.6918 \\
-exp4\_aug\_bn\_sgd & 74.57 & 70.30 & 0.7052 & 0.7052 \\
-exp5\_aug\_bn\_lr & 74.43 & 69.80 & 0.6959 & 0.6959 \\
-exp6\_improved\_long\_6 & 82.71 & 80.40 & 0.8055 & 0.8055 \\
-exp7\_improved\_long\_9 & 81.57 & \textbf{81.60} & \textbf{0.8153} & \textbf{0.8153} \\
-exp8\_improved\_longer\_12 & 70.29 & 69.50 & 0.6948 & 0.6948 \\
+baseline & 61.29 & 55.90 & 0.5594 & 0.5594 \\
+exp1\_aug & 74.00 & 68.30 & 0.6858 & 0.6858 \\
+exp2\_aug\_bn & 77.14 & 74.60 & 0.7461 & 0.7461 \\
+exp3\_aug\_dropout & 74.71 & 72.20 & 0.7239 & 0.7239 \\
+exp4\_aug\_bn\_sgd & 76.71 & 71.10 & 0.7115 & 0.7115 \\
+exp5\_aug\_bn\_lr & 76.43 & 73.30 & 0.7316 & 0.7316 \\
+exp6\_improved\_long\_6 & 86.00 & \textbf{81.80} & \textbf{0.8196} & \textbf{0.8196} \\
+exp7\_improved\_long\_9 & 83.71 & 81.40 & 0.8150 & 0.8150 \\
+exp8\_improved\_longer\_12 & 84.57 & 81.20 & 0.8120 & 0.8120 \\
+exp9\_aug\_bn\_15conv & 80.86 & 77.30 & 0.7744 & 0.7744 \\
 \bottomrule
 \end{tabular}%
 }
@@ -127,20 +131,68 @@ exp8\_improved\_longer\_12 & 70.29 & 69.50 & 0.6948 & 0.6948 \\
 \scriptsize exp6\_improved\_long\_6 &
 \scriptsize exp7\_improved\_long\_9 &
 \scriptsize exp8\_improved\_longer\_12 \\
+\addlinespace[2pt]
+\multicolumn{3}{@{}c@{}}{%
+  \cmfig{../outputs_improved/exp9_aug_bn_15conv/figures/exp9_aug_bn_15conv_configurable_15conv_confusion_matrix.png}} \\
+\multicolumn{3}{@{}c@{}}{\scriptsize exp9\_aug\_bn\_15conv} \\
 \end{tabularx}
-\captionof{figure}{测试集混淆矩阵（$3\times3$）}
+\captionof{figure}{测试集混淆矩阵（上三行 $3\times3$ 为 baseline 与 exp1--exp8；末行居中为 exp9）}
 \label{fig:cm_all}
 \end{minipage}
 \end{center}
 \FloatBarrier
 
 \section{训练过程与结果分析}
-\noindent 下面按对照分组放了训练曲线：每张图从左到右是训练/验证的 loss 和准确率，虚线是参照组、实线是对照组。数字以表~\ref{tab:summary} 为准，图主要是看收敛快慢和 train、val 差得大不大。
+\noindent 本节先单独给出 \textbf{baseline} 在最终测试集上的多分类指标（Precision、Recall、F1 与混淆矩阵），再按对照分组给出训练曲线：每张图从左到右是训练/验证的 loss 和准确率，虚线是参照组、实线是对照组。汇总数字以表~\ref{tab:summary} 为准，曲线主要看收敛快慢以及训练集与验证集差距。
+
+需要注意的是，本实验多数设置只在固定 seed 下运行一次，因此结果仍可能受到随机初始化和数据划分的影响。不同模型之间 0.2\%--0.5\% 的差距不一定代表稳定优势。
+
+\subsection{Baseline：测试集分类报告与混淆矩阵}
+Baseline 为无数据增强、无 BatchNorm、无 Dropout 的浅层 CNN（Adam，\texttt{lr=1e-3}）。在 STL-10 官方测试集（每类 100 张、共 1000 张）上，整体测试准确率为 \textbf{55.90\%}，与验证集相比仍有明显差距，说明存在过拟合。表~\ref{tab:baseline_report} 给出各类别的 Precision、Recall 与 F1-score；图~\ref{fig:baseline_cm} 为对应的测试集混淆矩阵
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+类别 & Precision & Recall & F1 & Support \\
+\midrule
+airplane & 0.7723 & 0.7800 & 0.7761 & 100 \\
+bird     & 0.4839 & 0.4500 & 0.4663 & 100 \\
+car      & 0.8101 & 0.6400 & 0.7151 & 100 \\
+cat      & 0.3883 & 0.4000 & 0.3941 & 100 \\
+deer     & 0.4672 & 0.5700 & 0.5135 & 100 \\
+dog      & 0.4245 & 0.4500 & 0.4369 & 100 \\
+horse    & 0.5773 & 0.5600 & 0.5685 & 100 \\
+monkey   & 0.4568 & 0.3700 & 0.4088 & 100 \\
+ship     & 0.7053 & 0.6700 & 0.6872 & 100 \\
+truck    & 0.5691 & 0.7000 & 0.6278 & 100 \\
+\midrule
+macro avg    & 0.5655 & 0.5590 & 0.5594 & 1000 \\
+weighted avg & 0.5655 & 0.5590 & 0.5594 & 1000 \\
+\bottomrule
+\end{tabular}
+\caption{Baseline 在 STL-10 测试集上的逐类 Precision、Recall、F1 及宏平均（Accuracy $=$ 0.5590）}
+\label{tab:baseline_report}
+\end{table}
+
+从表~\ref{tab:baseline_report} 可以看出，baseline 对 \texttt{car}、\texttt{ship}、\texttt{airplane} 这类外形比较明显的类别判断得相对好一些，Precision 或 Recall 比较高；但对 \texttt{cat}、\texttt{dog}、\texttt{monkey} 这类更相似的动物类别，效果就差一些。说明这个浅层 CNN 能学到一些整体轮廓特征，但还不太擅长区分细节，比如纹理、局部部件这些更细的差别。
+
+由于 STL-10 测试集中每个类别都是 100 张，类别比较均衡，所以 Macro-F1 和 Weighted-F1 数值接近，也和 Accuracy 比较接近。
+再结合图~\ref{fig:baseline_cm} 可以看到，混淆矩阵里非对角线位置还有不少数值，说明模型经常把一些类别互相认错。这也说明只用 baseline 还不够，后面继续尝试数据增强、BatchNorm 和更深网络是有必要的。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.62\linewidth]{../outputs_improved/baseline/figures/baseline_baseline_confusion_matrix.png}
+  \caption{Baseline 在 STL-10 测试集上的混淆矩阵}
+  \label{fig:baseline_cm}
+\end{figure}
 
 \subsection{（一）baseline $\rightarrow$ exp1：数据增强}
 \begin{itemize}
-  \item baseline 测试只有 54.70\%，exp1 拉到 66.50\%，成功率提升很多
-  \item 从曲线上看，baseline的过拟合非常严重，exp1的过拟合程度明显减轻，说明数据增强确实有效果
+  \item baseline 测试为 55.90\%，exp1 为 68.30\%，成功率提升明显
+  \item 从曲线上看，baseline 的过拟合非常明显，exp1的过拟合程度明显减轻，说明数据增强确实有效果
 \end{itemize}
 \begin{figure}[H]
   \centering
@@ -150,7 +202,7 @@ exp8\_improved\_longer\_12 & 70.29 & 69.50 & 0.6948 & 0.6948 \\
 
 \subsection{（二）exp1 $\rightarrow$ exp2：BatchNorm}
 \begin{itemize}
-  \item exp1 测试 66.50\%，exp2 到 71.70\%，又涨了 5 个点左右，说明在已经有增强的前提下，加上 BN 还是有效减小了过拟合。
+  \item exp1 测试 68.30\%，exp2 为 74.60\%，在已有增强的前提下加入 BatchNorm 后模型的效果明显提升，并且后面很多实验都在 exp2 的基础上进行。
 \end{itemize}
 \begin{figure}[H]
   \centering
@@ -160,7 +212,7 @@ exp8\_improved\_longer\_12 & 70.29 & 69.50 & 0.6948 & 0.6948 \\
 
 \subsection{（三）exp2 $\rightarrow$ exp3：Dropout（与 BN 路径对照）}
 \begin{itemize}
-  \item exp2 测试 71.70\%，exp3 只有 69.00\%，但都比baseline好。说明两种办法都很有效，且差异并没有很大。
+  \item exp2 测试 74.60\%，exp3 为 72.20\%，略低于 exp2，但均远高于 baseline，说明两条正则化路径都有效，差距不大。
  \end{itemize}
 \begin{figure}[H]
   \centering
@@ -170,7 +222,7 @@ exp8\_improved\_longer\_12 & 70.29 & 69.50 & 0.6948 & 0.6948 \\
 
 \subsection{（四）exp2 $\rightarrow$ exp4：优化器（Adam vs SGD）}
 \begin{itemize}
-  \item 不同的优化器对比，exp2（Adam）测试 71.70\%，exp4（SGD）70.30\%，差得不大，但确实是 exp2 略好一点。
+  \item 不同优化器对比：exp2（Adam）测试 74.60\%，exp4（SGD）71.10\%，Adam 略优。
 \end{itemize}
 \begin{figure}[H]
   \centering
@@ -180,7 +232,7 @@ exp8\_improved\_longer\_12 & 70.29 & 69.50 & 0.6948 & 0.6948 \\
 
 \subsection{（五）exp2 $\rightarrow$ exp5：学习率}
 \begin{itemize}
-  \item exp2 用 \texttt{1e-3}，exp5 改成 \texttt{3e-4}，测试从 71.70\% 掉到 69.80\% 左右，说明这次并不是学习率越小越稳越好。
+  \item exp2 用 \texttt{1e-3}，exp5 改成 \texttt{3e-4}，测试从 74.60\% 降到 73.30\%，说明并不是学习率越小越好。
 \end{itemize}
 \begin{figure}[H]
   \centering
@@ -188,10 +240,11 @@ exp8\_improved\_longer\_12 & 70.29 & 69.50 & 0.6948 & 0.6948 \\
   \caption{exp2\_aug\_bn（虚线）与 exp5\_aug\_bn\_lr（实线）}
 \end{figure}
 
-\subsection{（六）exp2 $\rightarrow$ exp6 / exp7 / exp8：网络深度}
+\subsection{（六）exp2 $\rightarrow$ exp6 / exp7 / exp8 / exp9：网络深度}
 \begin{itemize}
-  \item 浅层 exp2 测试 71.70\%，加深以后 exp6 到 80.40\%、exp7 到 81.60\%（全队最高），说明在一定范围内增加网络深度可以有效提升模型效果。
-  \item exp8 又掉到 69.50\%，跟 exp7 差了一大截，说明模型也不是越深越好
+  \item 浅层 exp2 测试 74.60\%；加深后 exp6 达 81.80\%、exp7 为 81.40\%、exp8 为 81.20\%，说明多段池化的深层骨干在本数据上明显优于浅层 configurable。
+  \item exp8 相对 exp6/exp7 未再带来额外增益，但仍保持与 exp7 接近的测试水平，说明继续加深并不保证单调提升，但也未必立刻崩溃。
+  \item 另设 exp9（与 exp2 同配方、15 个卷积层），测试 77.30\%，明显低于多段池化骨干 exp6（81.80\%）；下图将二者曲线对齐后可见，exp9 的验证准确率整体低于 exp6，\textbf{测试准确率也下降约 4.5 个百分点}，说明并非「层数堆得越多越好」。
 \end{itemize}
 \begin{figure}[H]
   \centering
@@ -208,67 +261,107 @@ exp8\_improved\_longer\_12 & 70.29 & 69.50 & 0.6948 & 0.6948 \\
   \includegraphics[width=\linewidth]{figures/comparisons/cmp_06c_exp2_exp8.png}
   \caption{exp2\_aug\_bn（虚线）与 exp8\_improved\_longer\_12（实线）}
 \end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{figures/comparisons/cmp_06d_exp6_exp9.png}
+  \caption{exp6\_improved\_long\_6（虚线）与 exp9\_aug\_bn\_15conv（实线）：exp9 验证与测试表现均低于 exp6，测试准确率由 81.80\% 降至 77.30\%}
+\end{figure}
 
 \section{可解释性分析（Grad-CAM）}
 \subsection{方法说明}
-Grad-CAM 用目标类别在 logits 上的标量得分对\textbf{最后一层卷积特征图}求梯度，把梯度在
-空间上做一次全局平均得到每个通道的权重，再对特征图通道加权求和并取 ReLU，得到一张与
-卷积特征同分辨率的类激活图，最后上采样到输入尺寸并伪彩色显示。直观上，它回答的是：
-模型为了把样本判成某一类，更依赖特征图里哪些空间位置（对应到原图大致落在哪些区域）。
+Grad-CAM 的作用是看模型做判断时主要关注了图片里的哪些位置。它会利用最后一层卷积特征图
+和类别得分的梯度，算出不同通道的重要程度，再合成一张热力图。热力图越亮的地方，说明模型
+在预测这个类别时越依赖这些区域。
 
-本实验在最后一层 \texttt{Conv2d} 上挂钩实现（未改动网络结构），热力图对应当前预测类别
-的解释（即对 $\arg\max$ 类别的 Grad-CAM）。脚本使用与测试阶段一致的预处理（Resize/CenterCrop、
-Normalize(0.5)）。
+本实验没有改动网络结构，只是在最后一层 \texttt{Conv2d} 上取特征和梯度。这里解释的是模型
+当前预测出来的类别，也就是 $\arg\max$ 对应的类别。输入图片的预处理方式和测试阶段保持一致，
+包括 Resize、CenterCrop 和 Normalize(0.5)。
 
-\subsection{可视化设置}
-模型选用当前测试集表现最好的 \texttt{exp7\_improved\_long\_9} 分支对应的 checkpoint；从 STL-10 官方
-划分测试集中筛选样本，分别给出\textbf{预测正确}与\textbf{预测错误}两类可视化，结果保存
-在 \texttt{homework/figures/gradcam/}（含 \texttt{correct/}、\texttt{wrong/} 子目录）。
-本地复现可运行：
-\begin{verbatim}
-python src/run_gradcam.py --checkpoint outputs_improved/exp7_improved_long_9/checkpoints/exp7_improved_long_9_best.pth
-\end{verbatim}
+\subsection{分析与讨论}
+模型选用当前测试集表现最好的 \texttt{exp6\_improved\_long\_6} 对应的 checkpoint。样本来自 STL-10
+官方测试集；为便于对比，从测试集中分别选取 \textbf{2} 个预测正确与 \textbf{4} 个预测错误的样本
+做 Grad-CAM。每张导出图均为「原图—热力图—叠加」三列排版。除下文用于排版的主图
+\texttt{gradcam\_correct\_1.png}、\texttt{gradcam\_correct\_2.png} 与
+\texttt{gradcam\_wrong\_1.png}—\texttt{gradcam\_wrong\_4.png} 外，脚本还会在
+\texttt{homework/figures/gradcam/correct/} 与 \texttt{wrong/} 下按样本索引另存一份，便于复查。
 
-\subsection{结果展示}
 \begin{figure}[H]
 \centering
 \begin{subfigure}{0.48\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{figures/gradcam/gradcam_correct_example.png}
-  \caption{预测正确：热力图多集中在物体主体与轮廓附近}
+  \includegraphics[width=\linewidth]{figures/gradcam/gradcam_correct_1.png}
+  \caption{预测正确样本 1}
 \end{subfigure}
 \hfill
 \begin{subfigure}{0.48\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{figures/gradcam/gradcam_wrong_example.png}
-  \caption{预测错误：高响应区域往往偏离标签或扩散到背景}
+  \includegraphics[width=\linewidth]{figures/gradcam/gradcam_correct_2.png}
+  \caption{预测正确样本 2}
 \end{subfigure}
-\caption{Grad-CAM 对比（左：正确样本；右：错误样本；均为原图/热力图/叠加）}
+\caption{预测正确时的 Grad-CAM：热力图多集中在物体主体与轮廓、纹理等可区分区域。}
 \end{figure}
 
-\subsection{分析与讨论}
-STL-10 图像主体相对居中、背景相对干净，若模型学到的是可迁移的语义线索，热力图应主要覆盖
-物体部位而不是大片纯色背景。实验观察大致符合这一点：在预测正确的样本上，热点往往贴在物体
-外轮廓与内部纹理较强区域；这与人类判断 ``物体在哪'' 的经验较为一致。
+从上述两个正确样本可以看出，模型比较集中地看到了物体主体，比如轮廓、
+纹理这些比较有辨识度的地方。这说明模型确实学到了一些和类别有关的图像信息，而不只是记住
+背景颜色或者图片位置。
 
-在预测错误的样本上，更容易看到两类现象：一是响应分散或偏向边缘/角落，说明模型可能被局部
-噪声带走；二是热点落在与标签类别相近的部位但在细粒度上混淆（例如动物类之间），这时热力图
-不一定 ``乱''，但它强调的语义区域与真实标签不一致，提示模型仍在做 ``看起来像'' 的关联，
-而非完全稳健的高层语义。
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{figures/gradcam/gradcam_wrong_1.png}
+  \caption{预测错误样本 1}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{figures/gradcam/gradcam_wrong_2.png}
+  \caption{预测错误样本 2}
+\end{subfigure}\\[0.6em]
+\begin{subfigure}{0.48\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{figures/gradcam/gradcam_wrong_3.png}
+  \caption{预测错误样本 3}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{figures/gradcam/gradcam_wrong_4.png}
+  \caption{预测错误样本 4}
+\end{subfigure}
+\caption{预测错误时的 Grad-CAM：注意力更易分散，或受背景、边缘干扰，或对关键部位响应不足，从而与相似类别混淆。}
+\end{figure}
 
-\subsection{小结}
-综合来看，模型并非只在像素层面做模板匹配：正确样本的可视化具有一定语义指向性；但错误样本
-说明决策仍会被背景或细粒度混淆干扰，距离 ``完全可靠的高层语义理解'' 仍有差距。这与测试集
-准确率约 81--82\%（\texttt{exp7} / \texttt{exp6}）相吻合。
+错误样本的热力图就没有这么理想。多个错误例子里，有时模型关注的位置比较散，或者被背景、边缘这些地方吸引；
+有时它也看到了物体附近，但抓到的特征不够准确，所以会把相似类别混在一起。也就是说，模型
+已经能找到一些有用区域，但还没有稳定到每次都能抓住真正关键的部分。
+
+
 
 \section{结论}
-本实验完成了 STL10 图像分类任务中的 baseline 与多组优化对比。结果表明：\textbf{数据增强 + BatchNorm} 可将浅层模型推到 71.70\%；\texttt{improved\_long} 与 \texttt{improved\_longer} 等更深骨干使测试准确率最高达到 \textbf{81.60\%}（\texttt{exp7}）。\texttt{exp8\_improved\_longer\_12} 在 \texttt{exp7} 配方上继续加深至 12 个卷积层，测试仅 \textbf{69.50\%}，说明在本数据与训练预算下\textbf{并非越深越好}。\texttt{exp4}（SGD）与 \texttt{exp5}（较小 Adam lr）在固定 \texttt{exp2} 结构下未超过原 Adam 配置。
+本次课程项目完成了 STL10 图像分类任务中的 baseline 与多组改进实验。整体结果来看，数据增强和 BatchNorm
+对浅层模型提升比较明显；继续加深网络后，\texttt{exp6\_improved\_long\_6} 取得了本实验中最高的测试准确率
+\textbf{81.80\%}。同时，\texttt{exp9\_aug\_bn\_15conv} 的结果也让我看到，单纯增加卷积层数不一定就会更好，
+模型结构、池化方式、训练轮数和正则化都需要一起考虑。
 
-Grad-CAM 可视化进一步表明模型在多数正确样本上会关注物体区域，但错误样本仍存在背景干扰与细粒度混淆，说明模型已经学到一定语义线索，但距离完全稳健的图像理解仍有改进空间。后续可继续尝试更精细的数据增强策略、学习率调度搜索和更深层网络结构，并结合更强的可解释性方法做对照。
+这次项目对我来说最大的收获不是只跑出了一个最高准确率，而是比较完整地走了一遍深度学习实验流程。
+五一期间我集中学习了 PyTorch，从一开始看不太懂 \texttt{Dataset}、\texttt{DataLoader}、\texttt{forward}
+和训练循环，到后面能够自己修改模型结构、调整实验配置、重新训练、整理曲线和分析结果，这个过程让我
+对卷积神经网络的训练有了更具体的认识。Grad-CAM 的可视化也让我意识到，模型的准确率只是一个方面，
+还需要看它到底关注了图像里的哪些区域，才能更好地理解模型为什么会预测正确或出错。
+
+最后，非常感谢老师在课堂上对人工智能原理和神经网络方法的讲解，也感谢助教李自远学长在课程项目中的
+答疑和指导。这个项目让我把课上学到的概念真正放到代码和实验里跑了一遍，也让我对后续继续学习人工智能原理更有信心。
 
 \section*{附件与提交说明}
-按课程要求整理代码、说明文档与实验报告。可解释性脚本位于 \texttt{src/gradcam.py}（核心实现）
-与 \texttt{src/run\_gradcam.py}（加载权重并导出图）。对照实验训练曲线（\texttt{cmp\_01\_baseline\_exp1.png} 等共 8 张）由 \texttt{src/plot\_comparison\_curves.py} 写入 \texttt{homework/figures/comparisons/}。运行依赖 PyTorch 与 torchvision（与训练环境一致），
-数据路径默认 \texttt{STL10/}。
+按课程要求整理代码、说明文档与实验报告。项目编程语言为 Python，主要依赖 PyTorch 与 torchvision。
+训练、测试、结果汇总和可解释性分析代码均放在 \texttt{src/} 目录下。本次作业已上传github仓库，地址为：\url{https://github.com/hezhou0331/CNN_learning.git}
+
+本次主要使用 OpenAI Codex 辅助完成模型搭建、实验脚本调整、批量运行实验、
+结果汇总、曲线绘制等工作。实验设计思路、最终结果选择、
+报告中的分析判断和结论由本人结合课程要求与实际实验结果完成。
+
+模型结构主要参考
+课堂中介绍的 CNN 基本思想，以及 PyTorch 官方模块中 Conv、Pooling、BatchNorm、Dropout 等常见层的用法自行搭建。
 
 \end{document}

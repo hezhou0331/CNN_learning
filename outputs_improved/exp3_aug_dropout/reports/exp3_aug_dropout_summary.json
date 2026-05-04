@@ -1,11 +1,11 @@
 {
-  "best_epoch": 40,
-  "best_val_acc": 74.14285714285714,
-  "ckpt_path": "outputs_improved\\exp3_aug_dropout\\checkpoints\\exp3_aug_dropout_best.pth",
+  "best_epoch": 68,
+  "best_val_acc": 74.71428571428571,
+  "ckpt_path": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved\\exp3_aug_dropout\\checkpoints\\exp3_aug_dropout_best.pth",
   "run_tag": "exp3_aug_dropout",
-  "output_root": "outputs_improved",
-  "run_root": "outputs_improved\\exp3_aug_dropout",
-  "experiment_id": "",
+  "output_root": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved",
+  "run_root": "D:\\Users\\ljy\\Desktop\\课程学习\\2026-春\\人工智能原理\\作业\\人工智能原理课程项目2\\outputs_improved\\exp3_aug_dropout",
+  "experiment_id": "exp3_aug_dropout",
   "model": "configurable",
   "use_augmentation": true,
   "use_bn": false,
@@ -13,5 +13,11 @@
   "optimizer": "adam",
   "lr": 0.001,
   "weight_decay": 0.0005,
-  "scheduler": "cosine"
+  "scheduler": "cosine",
+  "last_epoch": 88,
+  "stop_reason": "early_stop_val_acc_patience",
+  "epochs_requested": 100,
+  "patience": 20,
+  "scheduled_end_epoch": 100,
+  "started_from_epoch": 1
 }

@@ -226,6 +226,7 @@ def main() -> None:
         ("cmp_06a_exp2_exp6.png", "exp2_aug_bn", "exp6_improved_long_6", "exp2", "exp6"),
         ("cmp_06b_exp2_exp7.png", "exp2_aug_bn", "exp7_improved_long_9", "exp2", "exp7"),
         ("cmp_06c_exp2_exp8.png", "exp2_aug_bn", "exp8_improved_longer_12", "exp2", "exp8"),
+        ("cmp_06d_exp6_exp9.png", "exp6_improved_long_6", "exp9_aug_bn_15conv", "exp6", "exp9"),
     ]
     for fname, rr, cr, rl, cl in groups:
         plot_one_comparison(

@@ -130,13 +130,13 @@ def parse_args():
     p.add_argument(
         "--checkpoint",
         type=str,
-        default="outputs_improved/exp7_improved_long_9/checkpoints/exp7_improved_long_9_best.pth",
+        default="outputs_improved/exp6_improved_long_6/checkpoints/exp6_improved_long_6_best.pth",
         help="Path to *_best.pth",
     )
     p.add_argument("--data_root", type=str, default="STL10")
     p.add_argument("--output_dir", type=str, default="homework/figures/gradcam")
     p.add_argument("--n_correct", type=int, default=2, help="Number of correctly classified test samples")
-    p.add_argument("--n_wrong", type=int, default=2, help="Number of misclassified test samples")
+    p.add_argument("--n_wrong", type=int, default=4, help="Number of misclassified test samples")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--max_scan", type=int, default=8000, help="Stop scanning after this many test images")
     p.add_argument("--device", type=str, default="")
@@ -188,7 +188,20 @@ def main():
         for i, (idx, y_true, pred) in enumerate(wrong):
             run_one("wrong", idx, y_true, pred)
 
-        # Stable filenames for LaTeX / 报告引用
+        def render_sample(idx: int, y_true: int, pred: int, out_path: Path, title: str) -> None:
+            x, _ = test_set[idx]
+            x_in = x.unsqueeze(0).to(device).clone().detach().requires_grad_(True)
+            _, heat_rgb, over_rgb = grad_cam.compute_cam(x_in, target_class=pred)
+            save_triptych(x, heat_rgb, over_rgb, out_path, title)
+
+        for i, (idx, y_true, pred) in enumerate(correct, start=1):
+            t = f"预测正确 {i}/{len(correct)} | y={class_names[y_true]} | pred={class_names[pred]}"
+            render_sample(idx, y_true, pred, out_root / f"gradcam_correct_{i}.png", t)
+        for i, (idx, y_true, pred) in enumerate(wrong, start=1):
+            t = f"预测错误 {i}/{len(wrong)} | y={class_names[y_true]} | pred={class_names[pred]}"
+            render_sample(idx, y_true, pred, out_root / f"gradcam_wrong_{i}.png", t)
+
+        # Stable legacy filenames (first of each kind)
         if correct:
             idx, y_true, pred = correct[0]
             x, _ = test_set[idx]
