@@ -11,8 +11,8 @@ EXPERIMENT_ORDER = [
     "exp3_aug_dropout",
     "exp4_aug_bn_sgd",
     "exp5_aug_bn_lr",
-    "exp6_improved_long",
-    "exp7_improved_longer",
+    "exp6_improved_long_6",
+    "exp7_improved_long_9",
     "exp8_improved_longer_12",
 ]
 

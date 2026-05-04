@@ -87,9 +87,9 @@ EXPERIMENT_PRESETS = {
         "scheduler": "cosine",
     },
     # Experiment 6: deeper CNN (six downsampling stages), aug + Adam like exp2.
-    "exp6_improved_long": {
-        "exp_name": "exp6_improved_long",
-        "run_tag": "exp6_improved_long",
+    "exp6_improved_long_6": {
+        "exp_name": "exp6_improved_long_6",
+        "run_tag": "exp6_improved_long_6",
         "model": "improved_long",
         "use_augmentation": True,
         "use_bn": True,
@@ -100,9 +100,9 @@ EXPERIMENT_PRESETS = {
         "scheduler": "cosine",
     },
     # Experiment 7: nine conv layers (no residual), same aug/Adam/dropout as exp6.
-    "exp7_improved_longer": {
-        "exp_name": "exp7_improved_longer",
-        "run_tag": "exp7_improved_longer",
+    "exp7_improved_long_9": {
+        "exp_name": "exp7_improved_long_9",
+        "run_tag": "exp7_improved_long_9",
         "model": "improved_longer",
         "use_augmentation": True,
         "use_bn": True,

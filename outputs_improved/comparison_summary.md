@@ -8,8 +8,8 @@
 | exp3_aug_dropout | configurable | True | False | 0.3 | adam | 0.001 | 74.14 | 69.00 | 0.6918 | 0.6918 |
 | exp4_aug_bn_sgd | configurable | True | True | 0.0 | sgd | 0.01 | 74.57 | 70.30 | 0.7052 | 0.7052 |
 | exp5_aug_bn_lr | configurable | True | True | 0.0 | adam | 0.0003 | 74.43 | 69.80 | 0.6959 | 0.6959 |
-| exp6_improved_long | improved_long | True | True | 0.3 | adam | 0.001 | 82.71 | 80.40 | 0.8055 | 0.8055 |
-| exp7_improved_longer | improved_longer | True | True | 0.3 | adam | 0.001 | 81.57 | 81.60 | 0.8153 | 0.8153 |
+| exp6_improved_long_6 | improved_long | True | True | 0.3 | adam | 0.001 | 82.71 | 80.40 | 0.8055 | 0.8055 |
+| exp7_improved_long_9 | improved_longer | True | True | 0.3 | adam | 0.001 | 81.57 | 81.60 | 0.8153 | 0.8153 |
 | exp8_improved_longer_12 | improved_longer_12 | True | True | 0.3 | adam | 0.001 | 70.29 | 69.50 | 0.6948 | 0.6948 |
 
-- Best by test accuracy: `exp7_improved_longer` (81.60%).
+- Best by test accuracy: `exp7_improved_long_9` (81.60%).
