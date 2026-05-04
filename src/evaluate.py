@@ -14,11 +14,6 @@ from dataset import build_stl10_datasets, build_dataloaders
 from models import build_model
 from utils import ensure_dir, save_json
 
-try:
-    import seaborn as sns
-except ModuleNotFoundError:
-    sns = None
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate STL10 checkpoint")
@@ -35,21 +30,39 @@ def parse_args():
 
 
 def plot_confusion_matrix(cm, class_names, save_path):
-    plt.figure(figsize=(9, 7))
-    if sns is not None:
-        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names)
-    else:
-        plt.imshow(cm, interpolation="nearest", cmap="Blues")
-        plt.colorbar()
-        ticks = range(len(class_names))
-        plt.xticks(ticks, class_names, rotation=45, ha="right")
-        plt.yticks(ticks, class_names)
-    plt.xlabel("Predicted")
-    plt.ylabel("True")
-    plt.title("Confusion Matrix (Test)")
-    plt.tight_layout()
-    plt.savefig(save_path, dpi=150)
-    plt.close()
+    """
+    Always draw per-cell counts. (The old imshow-only branch had no annotations, so the
+    heatmap looked 'empty' aside from the diagonal color.)
+    """
+    fig, ax = plt.subplots(figsize=(9, 7))
+    im = ax.imshow(cm, interpolation="nearest", cmap="Blues")
+    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    n = len(class_names)
+    ticks = range(n)
+    ax.set_xticks(ticks)
+    ax.set_yticks(ticks)
+    ax.set_xticklabels(class_names, rotation=45, ha="right")
+    ax.set_yticklabels(class_names)
+    vmax = float(cm.max()) if cm.size else 1.0
+    thresh = vmax / 2.0
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            val = int(cm[i, j])
+            ax.text(
+                j,
+                i,
+                str(val),
+                ha="center",
+                va="center",
+                fontsize=9,
+                color="white" if cm[i, j] > thresh else "black",
+            )
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("True")
+    ax.set_title("Confusion Matrix (Test)")
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=150)
+    plt.close(fig)
 
 
 def main():

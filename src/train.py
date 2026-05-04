@@ -47,52 +47,82 @@ EXPERIMENT_PRESETS = {
         "weight_decay": 5e-4,
         "scheduler": "cosine",
     },
-    # Experiment 3: augmentation + batch normalization + dropout.
-    "exp3_aug_bn_dropout": {
-        "exp_name": "exp3_aug_bn_dropout",
+    # Experiment 3: augmentation + Dropout (no BatchNorm; configurable CNN).
+    "exp3_aug_dropout": {
+        "exp_name": "exp3_aug_dropout",
+        "run_tag": "exp3_aug_dropout",
         "model": "configurable",
         "use_augmentation": True,
-        "use_bn": True,
+        "use_bn": False,
         "dropout": 0.3,
         "optimizer": "adam",
         "lr": 1e-3,
         "weight_decay": 5e-4,
         "scheduler": "cosine",
     },
-    # Experiment 4A: optimizer/LR comparison branch (Adam).
-    "exp4_opt_adam": {
-        "exp_name": "exp4_opt_adam",
+    # Experiment 4: same as exp2 (aug + BN, no Dropout) with SGD.
+    "exp4_aug_bn_sgd": {
+        "exp_name": "exp4_aug_bn_sgd",
+        "run_tag": "exp4_aug_bn_sgd",
         "model": "configurable",
         "use_augmentation": True,
         "use_bn": True,
-        "dropout": 0.3,
-        "optimizer": "adam",
-        "lr": 1e-3,
-        "weight_decay": 5e-4,
-        "scheduler": "cosine",
-    },
-    # Experiment 4B: optimizer/LR comparison branch (SGD).
-    "exp4_opt_sgd": {
-        "exp_name": "exp4_opt_sgd",
-        "model": "configurable",
-        "use_augmentation": True,
-        "use_bn": True,
-        "dropout": 0.3,
+        "dropout": 0.0,
         "optimizer": "sgd",
         "lr": 1e-2,
         "weight_decay": 5e-4,
         "scheduler": "cosine",
     },
-    # Experiment 5: best combination selected from prior trials.
-    "exp5_best_combo": {
-        "exp_name": "exp5_best_combo",
+    # Experiment 5: same as exp2 with lower Adam learning rate.
+    "exp5_aug_bn_lr": {
+        "exp_name": "exp5_aug_bn_lr",
+        "run_tag": "exp5_aug_bn_lr",
         "model": "configurable",
         "use_augmentation": True,
         "use_bn": True,
+        "dropout": 0.0,
+        "optimizer": "adam",
+        "lr": 3e-4,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 6: deeper CNN (six downsampling stages), aug + Adam like exp2.
+    "exp6_improved_long": {
+        "exp_name": "exp6_improved_long",
+        "run_tag": "exp6_improved_long",
+        "model": "improved_long",
+        "use_augmentation": True,
+        "use_bn": True,
         "dropout": 0.3,
-        "optimizer": "adamw",
-        "lr": 8e-4,
-        "weight_decay": 1e-3,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 7: nine conv layers (no residual), same aug/Adam/dropout as exp6.
+    "exp7_improved_longer": {
+        "exp_name": "exp7_improved_longer",
+        "run_tag": "exp7_improved_longer",
+        "model": "improved_longer",
+        "use_augmentation": True,
+        "use_bn": True,
+        "dropout": 0.3,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
+    # Experiment 8: twelve conv layers (exp7 backbone + 3 extra 128-ch convs), same recipe as exp7.
+    "exp8_improved_longer_12": {
+        "exp_name": "exp8_improved_longer_12",
+        "run_tag": "exp8_improved_longer_12",
+        "model": "improved_longer_12",
+        "use_augmentation": True,
+        "use_bn": True,
+        "dropout": 0.3,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
         "scheduler": "cosine",
     },
 }
@@ -133,7 +163,19 @@ def run_one_epoch(model, loader, criterion, device, optimizer=None):
 def parse_args():
     parser = argparse.ArgumentParser(description="Train STL10 classifier")
     parser.add_argument("--data_root", type=str, default="STL10")
-    parser.add_argument("--model", type=str, default="baseline", choices=["baseline", "improved", "configurable"])
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="baseline",
+        choices=[
+            "baseline",
+            "improved",
+            "improved_long",
+            "improved_longer",
+            "improved_longer_12",
+            "configurable",
+        ],
+    )
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=1e-3)

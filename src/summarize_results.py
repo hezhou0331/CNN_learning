@@ -8,10 +8,12 @@ EXPERIMENT_ORDER = [
     "baseline",
     "exp1_aug",
     "exp2_aug_bn",
-    "exp3_aug_bn_dropout",
-    "exp4_opt_adam",
-    "exp4_opt_sgd",
-    "exp5_best_combo",
+    "exp3_aug_dropout",
+    "exp4_aug_bn_sgd",
+    "exp5_aug_bn_lr",
+    "exp6_improved_long",
+    "exp7_improved_longer",
+    "exp8_improved_longer_12",
 ]
 
 

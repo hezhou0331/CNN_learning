@@ -1,0 +1,17 @@
+{
+  "best_epoch": 14,
+  "best_val_acc": 70.28571428571429,
+  "ckpt_path": "..\\outputs_improved\\exp8_improved_longer_12\\checkpoints\\exp8_improved_longer_12_best.pth",
+  "run_tag": "exp8_improved_longer_12",
+  "output_root": "..\\outputs_improved",
+  "run_root": "..\\outputs_improved\\exp8_improved_longer_12",
+  "experiment_id": "exp8_improved_longer_12",
+  "model": "improved_longer_12",
+  "use_augmentation": true,
+  "use_bn": true,
+  "dropout": 0.3,
+  "optimizer": "adam",
+  "lr": 0.001,
+  "weight_decay": 0.0005,
+  "scheduler": "cosine"
+}

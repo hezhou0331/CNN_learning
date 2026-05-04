@@ -130,7 +130,7 @@ def parse_args():
     p.add_argument(
         "--checkpoint",
         type=str,
-        default="outputs_improved/exp2_aug_bn/checkpoints/exp2_aug_bn_best.pth",
+        default="outputs_improved/exp7_improved_longer/checkpoints/exp7_improved_longer_best.pth",
         help="Path to *_best.pth",
     )
     p.add_argument("--data_root", type=str, default="STL10")
