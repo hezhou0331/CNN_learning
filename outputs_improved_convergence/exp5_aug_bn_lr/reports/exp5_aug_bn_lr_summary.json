@@ -1,0 +1,17 @@
+{
+  "best_epoch": 78,
+  "best_val_acc": 76.42857142857143,
+  "ckpt_path": "outputs_improved_convergence\\exp5_aug_bn_lr\\checkpoints\\exp5_aug_bn_lr_best.pth",
+  "run_tag": "exp5_aug_bn_lr",
+  "output_root": "outputs_improved_convergence",
+  "run_root": "outputs_improved_convergence\\exp5_aug_bn_lr",
+  "experiment_id": "exp5_aug_bn_lr",
+  "model": "configurable",
+  "use_augmentation": true,
+  "use_bn": true,
+  "dropout": 0.0,
+  "optimizer": "adam",
+  "lr": 0.0003,
+  "weight_decay": 0.0005,
+  "scheduler": "cosine"
+}

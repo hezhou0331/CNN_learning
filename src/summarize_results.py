@@ -14,6 +14,7 @@ EXPERIMENT_ORDER = [
     "exp6_improved_long_6",
     "exp7_improved_long_9",
     "exp8_improved_longer_12",
+    "exp9_aug_bn_15conv",
 ]
 
 

@@ -1,0 +1,6 @@
+run,model,use_augmentation,use_bn,dropout,optimizer,lr,best_epoch,best_val_acc,test_accuracy,macro_f1,weighted_f1
+exp2_aug_bn_e100p20,configurable,True,True,0.0,adam,0.001,77,77.14285714285714,0.746,0.7461357084632378,0.7461357084632377
+exp3_aug_dropout_e100p20,configurable,True,False,0.3,adam,0.001,68,74.71428571428571,0.722,0.7238509009009952,0.7238509009009951
+exp6_improved_long_6_e100p20,improved_long,True,True,0.3,adam,0.001,89,86.0,0.818,0.8195716393291971,0.8195716393291972
+exp7_improved_long_9_e100p20,improved_longer,True,True,0.3,adam,0.001,73,83.71428571428571,0.814,0.8149712092219732,0.8149712092219733
+exp9_aug_bn_15conv_e100p20,configurable_15conv,True,True,0.0,adam,0.001,87,80.85714285714286,0.773,0.7744242259672945,0.7744242259672944

@@ -1,0 +1,23 @@
+{
+  "best_epoch": 68,
+  "best_val_acc": 74.71428571428571,
+  "ckpt_path": "outputs_improved_e100\\exp3_aug_dropout_e100p20\\checkpoints\\exp3_aug_dropout_e100p20_best.pth",
+  "run_tag": "exp3_aug_dropout_e100p20",
+  "output_root": "outputs_improved_e100",
+  "run_root": "outputs_improved_e100\\exp3_aug_dropout_e100p20",
+  "experiment_id": "exp3_aug_dropout",
+  "model": "configurable",
+  "use_augmentation": true,
+  "use_bn": false,
+  "dropout": 0.3,
+  "optimizer": "adam",
+  "lr": 0.001,
+  "weight_decay": 0.0005,
+  "scheduler": "cosine",
+  "last_epoch": 88,
+  "stop_reason": "early_stop_val_acc_patience",
+  "epochs_requested": 100,
+  "patience": 20,
+  "scheduled_end_epoch": 100,
+  "started_from_epoch": 1
+}

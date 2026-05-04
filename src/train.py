@@ -1,5 +1,9 @@
 import argparse
 import json
+import os
+import shutil
+import tempfile
+import time
 from pathlib import Path
 
 import torch
@@ -8,6 +12,31 @@ import torch.nn as nn
 from dataset import build_stl10_datasets, build_dataloaders
 from models import build_model
 from utils import ensure_dir, plot_training_curves, save_json, seed_everything
+
+
+def save_checkpoint_atomic(payload: dict, ckpt_path: Path) -> None:
+    """Write checkpoint via a temp file to avoid partial reads; Windows-friendly copy."""
+    ckpt_path = Path(ckpt_path)
+    ensure_dir(str(ckpt_path.parent))
+    fd, tmp_name = tempfile.mkstemp(suffix=".pth", prefix="ckpt_")
+    os.close(fd)
+    tmp_path = Path(tmp_name)
+    try:
+        torch.save(payload, tmp_path)
+        last_err = None
+        for attempt in range(10):
+            try:
+                shutil.copyfile(tmp_path, ckpt_path)
+                return
+            except OSError as e:
+                last_err = e
+                time.sleep(0.15 * (attempt + 1))
+        raise RuntimeError(f"Could not write checkpoint to {ckpt_path}") from last_err
+    finally:
+        try:
+            tmp_path.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 EXPERIMENT_PRESETS = {
@@ -125,6 +154,20 @@ EXPERIMENT_PRESETS = {
         "weight_decay": 5e-4,
         "scheduler": "cosine",
     },
+    # Experiment 9: same recipe as exp2 (aug + BN, no dropout, Adam) but 15 conv layers
+    # (3 stem + 12× 128→128 at 12×12), same FC head as configurable.
+    "exp9_aug_bn_15conv": {
+        "exp_name": "exp9_aug_bn_15conv",
+        "run_tag": "exp9_aug_bn_15conv",
+        "model": "configurable_15conv",
+        "use_augmentation": True,
+        "use_bn": True,
+        "dropout": 0.0,
+        "optimizer": "adam",
+        "lr": 1e-3,
+        "weight_decay": 5e-4,
+        "scheduler": "cosine",
+    },
 }
 
 
@@ -174,6 +217,7 @@ def parse_args():
             "improved_longer",
             "improved_longer_12",
             "configurable",
+            "configurable_15conv",
         ],
     )
     parser.add_argument("--epochs", type=int, default=50)
@@ -201,8 +245,11 @@ def apply_experiment_preset(args):
     if not args.experiment_id:
         return args
     preset = EXPERIMENT_PRESETS[args.experiment_id]
+    cli_run_tag = getattr(args, "run_tag", "") or ""
     for key, value in preset.items():
         setattr(args, key, value)
+    if cli_run_tag:
+        args.run_tag = cli_run_tag
     return args
 
 
@@ -300,6 +347,8 @@ def main():
         print(f"[Info] Continue run from epoch {best_epoch}.")
 
     end_epoch = start_epoch + args.epochs - 1
+    stop_reason = "max_epochs_reached"
+    last_epoch = start_epoch - 1
     for epoch in range(start_epoch, end_epoch + 1):
         train_loss, train_acc = run_one_epoch(model, train_loader, criterion, device, optimizer=optimizer)
         val_loss, val_acc = run_one_epoch(model, val_loader, criterion, device, optimizer=None)
@@ -310,6 +359,7 @@ def main():
         history["train_acc"].append(train_acc)
         history["val_acc"].append(val_acc)
         history["lr"].append(lr)
+        last_epoch = epoch
 
         print(
             f"Epoch {epoch}/{end_epoch} | "
@@ -324,25 +374,24 @@ def main():
             best_val_acc = val_acc
             best_epoch = epoch
             no_improve = 0
-            torch.save(
-                {
-                    "epoch": epoch,
-                    "model_name": args.model,
-                    "model_state_dict": model.state_dict(),
-                    "optimizer_state_dict": optimizer.state_dict(),
-                    "scheduler_state_dict": scheduler.state_dict() if scheduler is not None else None,
-                    "best_val_acc": best_val_acc,
-                    "run_tag": run_tag,
-                    "args": vars(args),
-                },
-                ckpt_path,
-            )
+            payload = {
+                "epoch": epoch,
+                "model_name": args.model,
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "scheduler_state_dict": scheduler.state_dict() if scheduler is not None else None,
+                "best_val_acc": best_val_acc,
+                "run_tag": run_tag,
+                "args": vars(args),
+            }
+            save_checkpoint_atomic(payload, ckpt_path)
             print(f"[Info] Saved best model -> {ckpt_path}")
         else:
             no_improve += 1
 
         if no_improve >= args.patience:
             print(f"[Info] Early stopping at epoch {epoch}. Best epoch: {best_epoch}")
+            stop_reason = "early_stop_val_acc_patience"
             break
 
     plot_training_curves(history, str(fig_dir), prefix=run_tag)
@@ -364,6 +413,12 @@ def main():
             "lr": args.lr,
             "weight_decay": args.weight_decay,
             "scheduler": args.scheduler,
+            "last_epoch": last_epoch,
+            "stop_reason": stop_reason,
+            "epochs_requested": args.epochs,
+            "patience": args.patience,
+            "scheduled_end_epoch": end_epoch,
+            "started_from_epoch": start_epoch,
         },
         str(summary_path),
     )
