@@ -28,7 +28,6 @@ __pycache__/
 *.xdv
 
 # Local temporary experiment outputs / notes
-outputs_baseline/
 outputs_improved_convergence/
 outputs_improved_e100/
 scripts/

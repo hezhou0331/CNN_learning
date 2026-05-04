@@ -8,6 +8,7 @@
 
 - `src/`：训练、测试、结果汇总、曲线绘制和 Grad-CAM 可视化代码。
 - `homework/`：最终实验报告、报告中引用的对比曲线和 Grad-CAM 图片。
+- `outputs_baseline/`：baseline 模型的原始训练输出，包含 checkpoint、训练曲线、分类报告和混淆矩阵。
 - `outputs_improved/`：最终报告采用的实验结果，包括汇总表、训练曲线、分类报告和混淆矩阵。
 - `人工智能原理课程项目2.pdf`：课程项目要求原文。
 - `STL10/`：本地数据集目录，已在 `.gitignore` 中忽略，不提交到 GitHub。
