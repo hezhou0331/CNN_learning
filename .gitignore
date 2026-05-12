@@ -24,8 +24,10 @@ __pycache__/
 *.fdb_latexmk
 *.fls
 *.log
+*.out
 *.toc
 *.xdv
+*.synctex.gz
 
 # Local temporary experiment outputs / notes
 outputs_improved_convergence/
